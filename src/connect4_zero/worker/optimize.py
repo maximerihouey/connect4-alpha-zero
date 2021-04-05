@@ -140,12 +140,12 @@ class OptimizeWorker:
 
         dirs = get_next_generation_model_dirs(rc)
         if not dirs:
-            logger.debug(f"loading best model")
+            logger.debug("loading best model")
             if not load_best_model_weight(model):
-                raise RuntimeError(f"Best model can not loaded!")
+                raise RuntimeError("Best model can not loaded!")
         else:
             latest_dir = dirs[-1]
-            logger.debug(f"loading latest model")
+            logger.debug("loading latest model")
             config_path = os.path.join(
                 latest_dir, rc.next_generation_model_config_filename
             )

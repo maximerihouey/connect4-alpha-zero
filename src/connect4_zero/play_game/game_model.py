@@ -35,10 +35,9 @@ class PlayWithHuman:
 
         self.last_history = self.ai.ask_thought_about(env.observation)
         self.last_evaluation = self.last_history.values[self.last_history.action]
-        if self.human_color == Player.black:
-            logger.debug(f"evaluation by ai={self.last_evaluation}")
-        else:
-            logger.debug(f"evaluation by ai={-self.last_evaluation}")
+        logger.debug(
+            f"evaluation by ai={self.last_evaluation}. human_color ({self.human_color}) Player.black ({Player.black})"
+        )
 
         return action
 
