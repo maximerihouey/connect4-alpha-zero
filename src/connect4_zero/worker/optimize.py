@@ -7,12 +7,18 @@ import keras.backend as K
 import numpy as np
 from keras.optimizers import SGD
 
-from connect4_zero.agent.model_connect4 import Connect4Model, objective_function_for_policy, \
-    objective_function_for_value
+from connect4_zero.agent.model_connect4 import (
+    Connect4Model,
+    objective_function_for_policy,
+    objective_function_for_value,
+)
 from connect4_zero.config import Config
 from connect4_zero.lib import tf_util
-from connect4_zero.lib.data_helper import get_game_data_filenames, read_game_data_from_file, \
-    get_next_generation_model_dirs
+from connect4_zero.lib.data_helper import (
+    get_game_data_filenames,
+    read_game_data_from_file,
+    get_next_generation_model_dirs,
+)
 from connect4_zero.lib.model_helpler import load_best_model_weight
 from connect4_zero.env.connect4_env import Connect4Env, Player
 
@@ -40,13 +46,17 @@ class OptimizeWorker:
 
     def training(self):
         self.compile_model()
-        last_load_data_step = last_save_step = total_steps = self.config.trainer.start_total_steps
+        last_load_data_step = (
+            last_save_step
+        ) = total_steps = self.config.trainer.start_total_steps
         min_data_size_to_learn = 1000
         self.load_play_data()
 
         while True:
             if self.dataset_size < min_data_size_to_learn:
-                logger.info(f"dataset_size={self.dataset_size} is less than {min_data_size_to_learn}")
+                logger.info(
+                    f"dataset_size={self.dataset_size} is less than {min_data_size_to_learn}"
+                )
                 sleep(60)
                 self.load_play_data()
                 continue
@@ -64,9 +74,9 @@ class OptimizeWorker:
     def train_epoch(self, epochs):
         tc = self.config.trainer
         state_ary, policy_ary, z_ary = self.dataset
-        self.model.model.fit(state_ary, [policy_ary, z_ary],
-                             batch_size=tc.batch_size,
-                             epochs=epochs)
+        self.model.model.fit(
+            state_ary, [policy_ary, z_ary], batch_size=tc.batch_size, epochs=epochs
+        )
         steps = (state_ary.shape[0] // tc.batch_size) * epochs
         return steps
 
@@ -95,7 +105,10 @@ class OptimizeWorker:
     def save_current_model(self):
         rc = self.config.resource
         model_id = datetime.now().strftime("%Y%m%d-%H%M%S.%f")
-        model_dir = os.path.join(rc.next_generation_model_dir, rc.next_generation_model_dirname_tmpl % model_id)
+        model_dir = os.path.join(
+            rc.next_generation_model_dir,
+            rc.next_generation_model_dirname_tmpl % model_id,
+        )
         os.makedirs(model_dir, exist_ok=True)
         config_path = os.path.join(model_dir, rc.next_generation_model_config_filename)
         weight_path = os.path.join(model_dir, rc.next_generation_model_weight_filename)
@@ -121,6 +134,7 @@ class OptimizeWorker:
 
     def load_model(self):
         from connect4_zero.agent.model_connect4 import Connect4Model
+
         model = Connect4Model(self.config)
         rc = self.config.resource
 
@@ -132,8 +146,12 @@ class OptimizeWorker:
         else:
             latest_dir = dirs[-1]
             logger.debug(f"loading latest model")
-            config_path = os.path.join(latest_dir, rc.next_generation_model_config_filename)
-            weight_path = os.path.join(latest_dir, rc.next_generation_model_weight_filename)
+            config_path = os.path.join(
+                latest_dir, rc.next_generation_model_config_filename
+            )
+            weight_path = os.path.join(
+                latest_dir, rc.next_generation_model_weight_filename
+            )
             model.load(config_path, weight_path)
         return model
 
@@ -146,7 +164,7 @@ class OptimizeWorker:
             self.load_data_from_file(filename)
             updated = True
 
-        for filename in (self.loaded_filenames - set(filenames)):
+        for filename in self.loaded_filenames - set(filenames):
             self.unload_data_of_file(filename)
             updated = True
 
@@ -185,7 +203,11 @@ class OptimizeWorker:
             env = Connect4Env().update(board)
 
             black_ary, white_ary = env.black_and_white_plane()
-            state = [black_ary, white_ary] if env.player_turn() == Player.black else [white_ary, black_ary]
+            state = (
+                [black_ary, white_ary]
+                if env.player_turn() == Player.black
+                else [white_ary, black_ary]
+            )
 
             state_list.append(state)
             policy_list.append(policy)

@@ -39,15 +39,21 @@ class ResourceConfig:
     def __init__(self):
         self.project_dir = os.environ.get("PROJECT_DIR", _project_dir())
         self.data_dir = os.environ.get("DATA_DIR", _data_dir())
-        self.model_dir = os.environ.get("MODEL_DIR", os.path.join(self.data_dir, "model"))
-        self.model_best_config_path = os.path.join(self.model_dir, "model_best_config.json")
-        self.model_best_weight_path = os.path.join(self.model_dir, "model_best_weight.h5")
+        self.model_dir = os.environ.get(
+            "MODEL_DIR", os.path.join(self.data_dir, "model")
+        )
+        self.model_best_config_path = os.path.join(
+            self.model_dir, "model_best_config.json"
+        )
+        self.model_best_weight_path = os.path.join(
+            self.model_dir, "model_best_weight.h5"
+        )
 
         self.model_best_distributed_ftp_server = "enews2.com"
         self.model_best_distributed_ftp_user = "ftp@enews2.com"
         self.model_best_distributed_ftp_password = "ngmAQedM9"
         self.model_best_distributed_ftp_remote_path = "/"
-        
+
         self.next_generation_model_dir = os.path.join(self.model_dir, "next_generation")
         self.next_generation_model_dirname_tmpl = "model_%s"
         self.next_generation_model_config_filename = "model_config.json"
@@ -60,8 +66,14 @@ class ResourceConfig:
         self.main_log_path = os.path.join(self.log_dir, "main.log")
 
     def create_directories(self):
-        dirs = [self.project_dir, self.data_dir, self.model_dir, self.play_data_dir, self.log_dir,
-                self.next_generation_model_dir]
+        dirs = [
+            self.project_dir,
+            self.data_dir,
+            self.model_dir,
+            self.play_data_dir,
+            self.log_dir,
+            self.next_generation_model_dir,
+        ]
         for d in dirs:
             if not os.path.exists(d):
                 os.makedirs(d)

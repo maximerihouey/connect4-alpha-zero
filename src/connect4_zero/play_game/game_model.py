@@ -24,6 +24,7 @@ class PlayWithHuman:
 
     def _load_model(self):
         from connect4_zero.agent.model_connect4 import Connect4Model
+
         model = Connect4Model(self.config)
         if not load_best_model_weight(model):
             raise RuntimeError("best model not found!")
@@ -44,7 +45,7 @@ class PlayWithHuman:
     def move_by_human(self, env):
         while True:
             try:
-                movement = input('\nEnter your movement (1, 2, 3, 4, 5, 6, 7): ')
+                movement = input("\nEnter your movement (1, 2, 3, 4, 5, 6, 7): ")
                 movement = int(movement) - 1
                 legal_moves = env.legal_moves()
                 if legal_moves[int(movement)] == 1:

@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 from logging import getLogger
+
 # noinspection PyPep8Naming
 import keras.backend as K
 import ftplib
@@ -30,8 +31,13 @@ class Connect4Model:
         in_x = x = Input((2, 6, 7))  # [own(8x8), enemy(8x8)]
 
         # (batch, channels, height, width)
-        x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_filter_size, padding="same",
-                   data_format="channels_first", kernel_regularizer=l2(mc.l2_reg))(x)
+        x = Conv2D(
+            filters=mc.cnn_filter_num,
+            kernel_size=mc.cnn_filter_size,
+            padding="same",
+            data_format="channels_first",
+            kernel_regularizer=l2(mc.l2_reg),
+        )(x)
         x = BatchNormalization(axis=1)(x)
         x = Activation("relu")(x)
 
@@ -40,32 +46,61 @@ class Connect4Model:
 
         res_out = x
         # for policy output
-        x = Conv2D(filters=2, kernel_size=1, data_format="channels_first", kernel_regularizer=l2(mc.l2_reg))(res_out)
+        x = Conv2D(
+            filters=2,
+            kernel_size=1,
+            data_format="channels_first",
+            kernel_regularizer=l2(mc.l2_reg),
+        )(res_out)
         x = BatchNormalization(axis=1)(x)
         x = Activation("relu")(x)
         x = Flatten()(x)
         # no output for 'pass'
-        policy_out = Dense(self.config.n_labels, kernel_regularizer=l2(mc.l2_reg), activation="softmax", name="policy_out")(x)
+        policy_out = Dense(
+            self.config.n_labels,
+            kernel_regularizer=l2(mc.l2_reg),
+            activation="softmax",
+            name="policy_out",
+        )(x)
 
         # for value output
-        x = Conv2D(filters=1, kernel_size=1, data_format="channels_first", kernel_regularizer=l2(mc.l2_reg))(res_out)
+        x = Conv2D(
+            filters=1,
+            kernel_size=1,
+            data_format="channels_first",
+            kernel_regularizer=l2(mc.l2_reg),
+        )(res_out)
         x = BatchNormalization(axis=1)(x)
         x = Activation("relu")(x)
         x = Flatten()(x)
-        x = Dense(mc.value_fc_size, kernel_regularizer=l2(mc.l2_reg), activation="relu")(x)
-        value_out = Dense(1, kernel_regularizer=l2(mc.l2_reg), activation="tanh", name="value_out")(x)
+        x = Dense(
+            mc.value_fc_size, kernel_regularizer=l2(mc.l2_reg), activation="relu"
+        )(x)
+        value_out = Dense(
+            1, kernel_regularizer=l2(mc.l2_reg), activation="tanh", name="value_out"
+        )(x)
 
         self.model = Model(in_x, [policy_out, value_out], name="connect4_model")
 
     def _build_residual_block(self, x):
         mc = self.config.model
         in_x = x
-        x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_filter_size, padding="same",
-                   data_format="channels_first", kernel_regularizer=l2(mc.l2_reg))(x)
+        x = Conv2D(
+            filters=mc.cnn_filter_num,
+            kernel_size=mc.cnn_filter_size,
+            padding="same",
+            data_format="channels_first",
+            kernel_regularizer=l2(mc.l2_reg),
+        )(x)
         x = BatchNormalization(axis=1)(x)
         x = Activation("relu")(x)
-        x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_filter_size, padding="same",
-                   data_format="channels_first", kernel_regularizer=l2(mc.l2_reg))(x)
+        x = Conv2D(
+            filters=mc.cnn_filter_num,
+            kernel_size=mc.cnn_filter_size,
+            padding="same",
+            data_format="channels_first",
+            kernel_regularizer=l2(mc.l2_reg),
+        )(x)
         x = BatchNormalization(axis=1)(x)
         x = Add()([in_x, x])
         x = Activation("relu")(x)
@@ -84,12 +119,18 @@ class Connect4Model:
         resources = self.config.resource
         if mc.distributed and config_path == resources.model_best_config_path:
             logger.debug(f"loading model from server")
-            ftp_connection = ftplib.FTP(resources.model_best_distributed_ftp_server,
-                                        resources.model_best_distributed_ftp_user,
-                                        resources.model_best_distributed_ftp_password)
+            ftp_connection = ftplib.FTP(
+                resources.model_best_distributed_ftp_server,
+                resources.model_best_distributed_ftp_user,
+                resources.model_best_distributed_ftp_password,
+            )
             ftp_connection.cwd(resources.model_best_distributed_ftp_remote_path)
-            ftp_connection.retrbinary("RETR model_best_config.json", open(config_path, 'wb').write)
-            ftp_connection.retrbinary("RETR model_best_weight.h5", open(weight_path, 'wb').write)
+            ftp_connection.retrbinary(
+                "RETR model_best_config.json", open(config_path, "wb").write
+            )
+            ftp_connection.retrbinary(
+                "RETR model_best_weight.h5", open(weight_path, "wb").write
+            )
             ftp_connection.quit()
 
         if os.path.exists(config_path) and os.path.exists(weight_path):
@@ -101,7 +142,9 @@ class Connect4Model:
             logger.debug(f"loaded model digest = {self.digest}")
             return True
         else:
-            logger.debug(f"model files does not exist at {config_path} and {weight_path}")
+            logger.debug(
+                f"model files does not exist at {config_path} and {weight_path}"
+            )
             return False
 
     def save(self, config_path, weight_path):
@@ -116,16 +159,18 @@ class Connect4Model:
         resources = self.config.resource
         if mc.distributed and config_path == resources.model_best_config_path:
             logger.debug(f"saving model to server")
-            ftp_connection = ftplib.FTP(resources.model_best_distributed_ftp_server,
-                                        resources.model_best_distributed_ftp_user,
-                                        resources.model_best_distributed_ftp_password)
+            ftp_connection = ftplib.FTP(
+                resources.model_best_distributed_ftp_server,
+                resources.model_best_distributed_ftp_user,
+                resources.model_best_distributed_ftp_password,
+            )
             ftp_connection.cwd(resources.model_best_distributed_ftp_remote_path)
-            fh = open(config_path, 'rb')
-            ftp_connection.storbinary('STOR model_best_config.json', fh)
+            fh = open(config_path, "rb")
+            ftp_connection.storbinary("STOR model_best_config.json", fh)
             fh.close()
 
-            fh = open(weight_path, 'rb')
-            ftp_connection.storbinary('STOR model_best_weight.h5', fh)
+            fh = open(weight_path, "rb")
+            ftp_connection.storbinary("STOR model_best_weight.h5", fh)
             fh.close()
             ftp_connection.quit()
 

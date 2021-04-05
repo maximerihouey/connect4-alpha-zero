@@ -49,17 +49,23 @@ class Connect4Player:
 
         for tl in range(self.play_config.thinking_loop):
             if tl > 0 and self.play_config.logging_thinking:
-                logger.debug(f"continue thinking: policy move=({action % 8}, {action // 8}), "
-                             f"value move=({action_by_value % 8}, {action_by_value // 8})")
+                logger.debug(
+                    f"continue thinking: policy move=({action % 8}, {action // 8}), "
+                    f"value move=({action_by_value % 8}, {action_by_value // 8})"
+                )
             self.search_moves(board)
             policy = self.calc_policy(board)
             action = int(np.random.choice(range(self.labels_n), p=policy))
-            action_by_value = int(np.argmax(self.var_q[key] + (self.var_n[key] > 0)*100))
+            action_by_value = int(
+                np.argmax(self.var_q[key] + (self.var_n[key] > 0) * 100)
+            )
             if action == action_by_value or env.turn < self.play_config.change_tau_turn:
                 break
 
         # this is for play_gui, not necessary when training.
-        self.thinking_history[env.observation] = HistoryItem(action, policy, list(self.var_q[key]), list(self.var_n[key]))
+        self.thinking_history[env.observation] = HistoryItem(
+            action, policy, list(self.var_q[key]), list(self.var_n[key])
+        )
 
         self.moves.append([env.observation, list(policy)])
         return action
@@ -128,7 +134,9 @@ class Connect4Player:
         # on returning search path
         # update: N, W, Q, U
         n = self.var_n[key][action_t] = self.var_n[key][action_t] - virtual_loss + 1
-        w = self.var_w[key][action_t] = self.var_w[key][action_t] + virtual_loss + leaf_v
+        w = self.var_w[key][action_t] = (
+            self.var_w[key][action_t] + virtual_loss + leaf_v
+        )
         self.var_q[key][action_t] = w / n
         return leaf_v
 
@@ -144,7 +152,11 @@ class Connect4Player:
         self.now_expanding.add(key)
 
         black_ary, white_ary = env.black_and_white_plane()
-        state = [black_ary, white_ary] if env.player_turn() == Player.black else [white_ary, black_ary]
+        state = (
+            [black_ary, white_ary]
+            if env.player_turn() == Player.black
+            else [white_ary, black_ary]
+        )
         future = await self.predict(np.array(state))  # type: Future
         await future
         leaf_p, leaf_v = future.result()
@@ -168,7 +180,9 @@ class Connect4Player:
                     margin -= 1
                 await asyncio.sleep(self.config.play.prediction_worker_sleep_sec)
                 continue
-            item_list = [q.get_nowait() for _ in range(q.qsize())]  # type: list[QueueItem]
+            item_list = [
+                q.get_nowait() for _ in range(q.qsize())
+            ]  # type: list[QueueItem]
             # logger.debug(f"predicting {len(item_list)} items")
             data = np.array([x.state for x in item_list])
             policy_ary, value_ary = self.api.predict(data)
@@ -220,8 +234,11 @@ class Connect4Player:
         p_ = self.var_p[key]
 
         if is_root_node:  # Is it correct?? -> (1-e)p + e*Dir(0.03)
-            p_ = (1 - self.play_config.noise_eps) * p_ + \
-                 self.play_config.noise_eps * np.random.dirichlet([self.play_config.dirichlet_alpha] * self.labels_n)
+            p_ = (
+                1 - self.play_config.noise_eps
+            ) * p_ + self.play_config.noise_eps * np.random.dirichlet(
+                [self.play_config.dirichlet_alpha] * self.labels_n
+            )
 
         u_ = self.play_config.c_puct * p_ * xx_ / (1 + self.var_n[key])
         if env.player_turn() == Player.white:
