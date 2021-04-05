@@ -24,6 +24,7 @@ class PlayWithHuman:
 
     def _load_model(self):
         from connect4_zero.agent.model_connect4 import Connect4Model
+
         model = Connect4Model(self.config)
         if not load_best_model_weight(model):
             raise RuntimeError("best model not found!")
@@ -34,22 +35,21 @@ class PlayWithHuman:
 
         self.last_history = self.ai.ask_thought_about(env.observation)
         self.last_evaluation = self.last_history.values[self.last_history.action]
-        if self.human_color == Player.black:
-            logger.debug(f"evaluation by ai={self.last_evaluation}")
-        else:
-            logger.debug(f"evaluation by ai={-self.last_evaluation}")
+        logger.debug(
+            f"evaluation by ai={self.last_evaluation}. human_color ({self.human_color}) Player.black ({Player.black})"
+        )
 
         return action
 
     def move_by_human(self, env):
         while True:
             try:
-                movement = input('\nEnter your movement (1, 2, 3, 4, 5, 6, 7): ')
+                movement = input("\nEnter your movement (1, 2, 3, 4, 5, 6, 7): ")
                 movement = int(movement) - 1
                 legal_moves = env.legal_moves()
                 if legal_moves[int(movement)] == 1:
                     return int(movement)
                 else:
                     print("That is NOT a valid movement :(.")
-            except:
+            except Exception:
                 print("That is NOT a valid movement :(.")

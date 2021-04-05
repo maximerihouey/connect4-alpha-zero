@@ -25,7 +25,7 @@ class Connect4Env:
         for i in range(6):
             self.board.append([])
             for j in range(7):
-                self.board[i].append(' ')
+                self.board[i].append(" ")
         self.turn = 0
         self.done = False
         self.winner = None
@@ -44,7 +44,7 @@ class Connect4Env:
         turn = 0
         for i in range(6):
             for j in range(7):
-                if self.board[i][j] != ' ':
+                if self.board[i][j] != " ":
                     turn += 1
 
         return turn
@@ -61,8 +61,10 @@ class Connect4Env:
             return self.board, {}
 
         for i in range(6):
-            if self.board[i][action] == ' ':
-                self.board[i][action] = ('X' if self.player_turn() == Player.white else 'O')
+            if self.board[i][action] == " ":
+                self.board[i][action] = (
+                    "X" if self.player_turn() == Player.white else "O"
+                )
                 break
 
         self.turn += 1
@@ -80,7 +82,7 @@ class Connect4Env:
         legal = [0, 0, 0, 0, 0, 0, 0]
         for j in range(7):
             for i in range(6):
-                if self.board[i][j] == ' ':
+                if self.board[i][j] == " ":
                     legal[j] = 1
                     break
 
@@ -89,7 +91,7 @@ class Connect4Env:
     def check_for_fours(self):
         for i in range(6):
             for j in range(7):
-                if self.board[i][j] != ' ':
+                if self.board[i][j] != " ":
                     # check if a vertical four-in-a-row starts at (i, j)
                     if self.vertical_check(i, j):
                         self.done = True
@@ -119,7 +121,7 @@ class Connect4Env:
 
         if consecutive_count >= 4:
             four_in_a_row = True
-            if 'x' == self.board[row][col].lower():
+            if "x" == self.board[row][col].lower():
                 self.winner = Winner.white
             else:
                 self.winner = Winner.black
@@ -138,7 +140,7 @@ class Connect4Env:
 
         if consecutive_count >= 4:
             four_in_a_row = True
-            if 'x' == self.board[row][col].lower():
+            if "x" == self.board[row][col].lower():
                 self.winner = Winner.white
             else:
                 self.winner = Winner.black
@@ -162,7 +164,7 @@ class Connect4Env:
 
         if consecutive_count >= 4:
             count += 1
-            if 'x' == self.board[row][col].lower():
+            if "x" == self.board[row][col].lower():
                 self.winner = Winner.white
             else:
                 self.winner = Winner.black
@@ -180,7 +182,7 @@ class Connect4Env:
 
         if consecutive_count >= 4:
             count += 1
-            if 'x' == self.board[row][col].lower():
+            if "x" == self.board[row][col].lower():
                 self.winner = Winner.white
             else:
                 self.winner = Winner.black
@@ -203,10 +205,10 @@ class Connect4Env:
         board_black = np.copy(self.board)
         for i in range(6):
             for j in range(7):
-                if self.board[i][j] == ' ':
+                if self.board[i][j] == " ":
                     board_white[i][j] = 0
                     board_black[i][j] = 0
-                elif self.board[i][j] == 'X':
+                elif self.board[i][j] == "X":
                     board_white[i][j] = 1
                     board_black[i][j] = 0
                 else:
@@ -237,4 +239,4 @@ class Connect4Env:
 
     @property
     def observation(self):
-        return ''.join(''.join(x for x in y) for y in self.board)
+        return "".join("".join(x for x in y) for y in self.board)

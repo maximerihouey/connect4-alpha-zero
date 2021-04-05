@@ -7,7 +7,7 @@ from .config import Config
 
 logger = getLogger(__name__)
 
-CMD_LIST = ['self', 'opt', 'eval', 'play_gui']
+CMD_LIST = ["self", "opt", "eval", "play_gui"]
 
 
 def create_parser():
@@ -15,7 +15,9 @@ def create_parser():
     parser.add_argument("cmd", help="what to do", choices=CMD_LIST)
     parser.add_argument("--new", help="run from new best model", action="store_true")
     parser.add_argument("--type", help="use normal setting", default="normal")
-    parser.add_argument("--total-step", help="set TrainerConfig.start_total_steps", type=int)
+    parser.add_argument(
+        "--total-step", help="set TrainerConfig.start_total_steps", type=int
+    )
     return parser
 
 
@@ -39,13 +41,17 @@ def start():
 
     if args.cmd == "self":
         from .worker import self_play
+
         return self_play.start(config)
-    elif args.cmd == 'opt':
+    elif args.cmd == "opt":
         from .worker import optimize
+
         return optimize.start(config)
-    elif args.cmd == 'eval':
+    elif args.cmd == "eval":
         from .worker import evaluate
+
         return evaluate.start(config)
-    elif args.cmd == 'play_gui':
+    elif args.cmd == "play_gui":
         from .play_game import gui
+
         return gui.start(config)

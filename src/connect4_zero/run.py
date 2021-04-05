@@ -1,4 +1,3 @@
-
 import os
 import sys
 from dotenv import load_dotenv, find_dotenv
@@ -14,4 +13,5 @@ if _PATH_ not in sys.path:
 
 if __name__ == "__main__":
     from connect4_zero import manager
+
     manager.start()

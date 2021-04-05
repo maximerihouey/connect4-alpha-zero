@@ -50,12 +50,21 @@ class EvaluateWorker:
             if ng_win is not None:
                 results.append(ng_win)
                 winning_rate = sum(results) / len(results)
-            logger.debug(f"game {game_idx}: ng_win={ng_win} white_is_best_model={white_is_best} "
-                         f"winning rate {winning_rate*100:.1f}%")
-            if results.count(0) >= self.config.eval.game_num * (1-self.config.eval.replace_rate):
-                logger.debug(f"lose count reach {results.count(0)} so give up challenge")
+            logger.debug(
+                f"game {game_idx}: ng_win={ng_win} white_is_best_model={white_is_best} "
+                f"winning rate {winning_rate*100:.1f}%"
+            )
+            if results.count(0) >= self.config.eval.game_num * (
+                1 - self.config.eval.replace_rate
+            ):
+                logger.debug(
+                    f"lose count reach {results.count(0)} so give up challenge"
+                )
                 break
-            if results.count(1) >= self.config.eval.game_num * self.config.eval.replace_rate:
+            if (
+                results.count(1)
+                >= self.config.eval.game_num * self.config.eval.replace_rate
+            ):
                 logger.debug(f"win count reach {results.count(1)} so change best model")
                 break
 
@@ -69,8 +78,12 @@ class EvaluateWorker:
     def play_game(self, best_model, ng_model):
         env = Connect4Env().reset()
 
-        best_player = Connect4Player(self.config, best_model, play_config=self.config.eval.play_config)
-        ng_player = Connect4Player(self.config, ng_model, play_config=self.config.eval.play_config)
+        best_player = Connect4Player(
+            self.config, best_model, play_config=self.config.eval.play_config
+        )
+        ng_player = Connect4Player(
+            self.config, ng_model, play_config=self.config.eval.play_config
+        )
         best_is_white = random() < 0.5
         if not best_is_white:
             black, white = best_player, ng_player
@@ -109,7 +122,7 @@ class EvaluateWorker:
             dirs = get_next_generation_model_dirs(self.config.resource)
             if dirs:
                 break
-            logger.info(f"There is no next generation model to evaluate")
+            logger.info("There is no next generation model to evaluate")
             sleep(60)
         model_dir = dirs[-1] if self.config.eval.evaluate_latest_first else dirs[0]
         config_path = os.path.join(model_dir, rc.next_generation_model_config_filename)

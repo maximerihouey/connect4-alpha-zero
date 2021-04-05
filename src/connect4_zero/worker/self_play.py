@@ -7,9 +7,15 @@ from connect4_zero.agent.player_connect4 import Connect4Player
 from connect4_zero.config import Config
 from connect4_zero.env.connect4_env import Connect4Env, Winner, Player
 from connect4_zero.lib import tf_util
-from connect4_zero.lib.data_helper import get_game_data_filenames, write_game_data_to_file
-from connect4_zero.lib.model_helpler import load_best_model_weight, save_as_best_model, \
-    reload_best_model_weight_if_changed
+from connect4_zero.lib.data_helper import (
+    get_game_data_filenames,
+    write_game_data_to_file,
+)
+from connect4_zero.lib.model_helpler import (
+    load_best_model_weight,
+    save_as_best_model,
+    reload_best_model_weight_if_changed,
+)
 
 logger = getLogger(__name__)
 
@@ -29,7 +35,7 @@ class SelfPlayWorker:
         """
         self.config = config
         self.model = model
-        self.env = env     # type: Connect4Env
+        self.env = env  # type: Connect4Env
         self.black = None  # type: Connect4Player
         self.white = None  # type: Connect4Player
         self.buffer = []
@@ -45,8 +51,10 @@ class SelfPlayWorker:
             start_time = time()
             env = self.start_game(idx)
             end_time = time()
-            logger.debug(f"game {idx} time={end_time - start_time} sec, "
-                         f"turn={env.turn}:{env.observation} - Winner:{env.winner}")
+            logger.debug(
+                f"game {idx} time={end_time - start_time} sec, "
+                f"turn={env.turn}:{env.observation} - Winner:{env.winner}"
+            )
             if (idx % self.config.play_data.nb_game_in_file) == 0:
                 reload_best_model_weight_if_changed(self.model)
             idx += 1
@@ -100,10 +108,9 @@ class SelfPlayWorker:
 
     def load_model(self):
         from connect4_zero.agent.model_connect4 import Connect4Model
+
         model = Connect4Model(self.config)
         if self.config.opts.new or not load_best_model_weight(model):
             model.build()
             save_as_best_model(model)
         return model
-
-
