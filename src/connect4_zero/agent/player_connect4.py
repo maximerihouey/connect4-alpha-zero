@@ -47,6 +47,8 @@ class Connect4Player:
         env = Connect4Env().update(board)
         key = self.counter_key(env)
 
+        action = 0
+        action_by_value = 0
         for tl in range(self.play_config.thinking_loop):
             if tl > 0 and self.play_config.logging_thinking:
                 logger.debug(

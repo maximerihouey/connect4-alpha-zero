@@ -118,7 +118,7 @@ class Connect4Model:
         mc = self.config.model
         resources = self.config.resource
         if mc.distributed and config_path == resources.model_best_config_path:
-            logger.debug(f"loading model from server")
+            logger.debug("loading model from server")
             ftp_connection = ftplib.FTP(
                 resources.model_best_distributed_ftp_server,
                 resources.model_best_distributed_ftp_user,
@@ -158,7 +158,7 @@ class Connect4Model:
         mc = self.config.model
         resources = self.config.resource
         if mc.distributed and config_path == resources.model_best_config_path:
-            logger.debug(f"saving model to server")
+            logger.debug("saving model to server")
             ftp_connection = ftplib.FTP(
                 resources.model_best_distributed_ftp_server,
                 resources.model_best_distributed_ftp_user,

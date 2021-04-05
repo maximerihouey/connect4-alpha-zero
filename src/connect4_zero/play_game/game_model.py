@@ -52,5 +52,5 @@ class PlayWithHuman:
                     return int(movement)
                 else:
                     print("That is NOT a valid movement :(.")
-            except:
+            except Exception as e:
                 print("That is NOT a valid movement :(.")
