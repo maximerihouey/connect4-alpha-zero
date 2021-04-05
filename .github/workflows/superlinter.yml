@@ -22,7 +22,7 @@ jobs:
         uses: github/super-linter@v3
         env:
           DEFAULT_BRANCH: master
-          MARKDOWN: false
+          VALIDATE_MARKDOWN: false
           VALIDATE_JSCPD: false
           VALIDATE_PYTHON_ISORT: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
